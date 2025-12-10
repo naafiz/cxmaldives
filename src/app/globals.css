@@ -35,6 +35,47 @@
   --glass-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.1);
 }
 
+[data-theme='contrast'] {
+  --bg-main: #000000;
+  --bg-card: #000000;
+  --text-main: #FFFF00;
+  --text-muted: #FFFFFF;
+
+  --pk-primary: #FFFF00;
+  /* Yellow */
+  --glass-border: #FFFF00;
+  --glass-bg: #000000;
+  --glass-shadow: none;
+  --radius: 0px;
+  /* Sharp edges for contrast */
+}
+
+/* Contrast specific overrides */
+[data-theme='contrast'] .btn-primary {
+  background: #FFFF00;
+  color: #000000;
+  border: 2px solid #FFFF00;
+  font-weight: 900;
+}
+
+[data-theme='contrast'] .btn-outline {
+  border: 2px solid #FFFF00;
+  color: #FFFF00;
+  font-weight: 900;
+}
+
+[data-theme='contrast'] .card {
+  border: 2px solid #FFFF00;
+}
+
+[data-theme='contrast'] .title-gradient {
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  color: #FFFF00;
+  text-decoration: underline;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -238,4 +279,28 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 .flatpickr-day.selected {
   background: var(--pk-primary) !important;
   border-color: var(--pk-primary) !important;
+}
+
+/* Skeleton Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--glass-border) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+[data-theme='contrast'] .skeleton {
+  background: #333;
+  /* Simple contrast for accessibility, no shimmer */
+  animation: none;
+  border: 1px dashed #FFFF00;
 }

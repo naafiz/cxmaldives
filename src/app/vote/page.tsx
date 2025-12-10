@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import confetti from 'canvas-confetti';
+import Skeleton from '@/components/Skeleton';
 
 export default function VotingPage() {
     const router = useRouter();
@@ -89,6 +91,32 @@ export default function VotingPage() {
             setSuccess(true);
             setHasVoted(true);
             window.scrollTo(0, 0);
+
+            // Trigger Confetti
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#008080', '#FFD700', '#FFFFFF']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#008080', '#FFD700', '#FFFFFF']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -96,7 +124,13 @@ export default function VotingPage() {
         }
     };
 
-    if (loading) return <div className="container">Loading...</div>;
+    if (loading) return (
+        <div className="container" style={{ padding: '2rem 0' }}>
+            <Skeleton width="40%" height="50px" style={{ margin: '0 auto 2rem auto' }} />
+            <Skeleton width="100%" height="200px" style={{ marginBottom: '2rem' }} />
+            <Skeleton width="100%" height="200px" />
+        </div>
+    );
 
     // Block if closed (unless verifying own vote)
     const isClosed = status && (!status.isOpen || status.positionCount === 0);

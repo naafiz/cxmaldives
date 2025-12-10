@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Skeleton from '@/components/Skeleton';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -44,7 +45,19 @@ export default function DashboardPage() {
         router.push('/login');
     };
 
-    if (loading) return <div className="container">Loading...</div>;
+    if (loading) return (
+        <div className="container" style={{ padding: '2rem 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Skeleton width="200px" height="40px" />
+                <Skeleton width="100px" height="40px" />
+            </div>
+            <div className="card" style={{ marginTop: '2rem', padding: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                <Skeleton width="60%" height="30px" />
+                <Skeleton width="80%" height="20px" />
+                <Skeleton width="200px" height="50px" style={{ marginTop: '20px' }} />
+            </div>
+        </div>
+    );
 
     const showVotingButton = status?.isOpen && status?.positionCount > 0;
 

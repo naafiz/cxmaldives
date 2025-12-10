@@ -13,7 +13,11 @@ export default function ThemeToggle() {
     }, []);
 
     const toggleTheme = () => {
-        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        let newTheme = 'dark';
+        if (theme === 'dark') newTheme = 'light';
+        else if (theme === 'light') newTheme = 'contrast';
+        else newTheme = 'dark';
+
         setTheme(newTheme);
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
@@ -28,7 +32,7 @@ export default function ThemeToggle() {
             }}
             aria-label="Toggle Theme"
         >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? '☀️' : theme === 'light' ? '👁️' : '🌙'}
         </button>
     );
 }
