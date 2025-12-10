@@ -231,6 +231,7 @@ export default function AdminPage() {
                             {savingSettings ? 'Saving...' : 'Update Window'}
                         </button>
                     </form>
+                )}
 
 
             </div>

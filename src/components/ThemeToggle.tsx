@@ -8,8 +8,11 @@ export default function ThemeToggle() {
     useEffect(() => {
         // Load saved theme or default to dark
         const saved = localStorage.getItem('theme') || 'dark';
-        setTheme(saved);
+        if (saved !== theme) {
+            setTheme(saved);
+        }
         document.documentElement.setAttribute('data-theme', saved);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const toggleTheme = () => {
