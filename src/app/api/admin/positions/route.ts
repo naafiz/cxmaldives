@@ -4,6 +4,8 @@ import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
 
 // Helper to check admin role
+export const dynamic = 'force-dynamic';
+
 async function checkAdmin() {
     const cookieStore = await cookies();
     const token = cookieStore.get('session')?.value;
