@@ -206,33 +206,57 @@ export default function AdminPage() {
                     </div>
                 )}
                 {settings && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                        <form onSubmit={saveSettings} className="settings-form">
-                            <h3>Election Window</h3>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '5px' }}>Start Time</label>
-                                <Flatpickr
-                                    value={settings.startTime}
-                                    onChange={([date]) => setSettings({ ...settings, startTime: date })}
-                                    options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
-                                    className="input-field"
-                                />
-                            </div>
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '5px' }}>End Time</label>
-                                <Flatpickr
-                                    value={settings.endTime}
-                                    onChange={([date]) => setSettings({ ...settings, endTime: date })}
-                                    options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
-                                    className="input-field"
-                                />
-                            </div>
-                            <button className="btn btn-primary" disabled={savingSettings}>
-                                {savingSettings ? 'Saving...' : 'Update Window'}
-                            </button>
-                        </form>
 
-                    </div>
+                    <form onSubmit={saveSettings} className="settings-form">
+                        <h3>Election Window</h3>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '5px' }}>Start Time</label>
+                            <Flatpickr
+                                value={settings.startTime}
+                                onChange={([date]) => setSettings({ ...settings, startTime: date })}
+                                options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
+                                className="input-field"
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '5px' }}>End Time</label>
+                            <Flatpickr
+                                value={settings.endTime}
+                                onChange={([date]) => setSettings({ ...settings, endTime: date })}
+                                options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
+                                className="input-field"
+                            />
+                        </div>
+                        <button className="btn btn-primary" disabled={savingSettings}>
+                            {savingSettings ? 'Saving...' : 'Update Window'}
+                        </button>
+                    </form>
+
+                        {settings && (
+                    <form onSubmit={saveSettings} className="settings-form">
+                        <h3>Election Window</h3>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '5px' }}>Start Time</label>
+                            <Flatpickr
+                                value={settings.startTime}
+                                onChange={([date]) => setSettings({ ...settings, startTime: date })}
+                                options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
+                                className="input-field"
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '5px' }}>End Time</label>
+                            <Flatpickr
+                                value={settings.endTime}
+                                onChange={([date]) => setSettings({ ...settings, endTime: date })}
+                                options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
+                                className="input-field"
+                            />
+                        </div>
+                        <button className="btn btn-primary" disabled={savingSettings}>
+                            {savingSettings ? 'Saving...' : 'Update Window'}
+                        </button>
+                    </form>
                 )}
             </div>
 
