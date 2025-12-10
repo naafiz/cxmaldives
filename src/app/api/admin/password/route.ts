@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
         // Get current admin
         const admin = await prisma.admin.findUnique({
-            where: { username: payload.name || 'admin' } // Assuming 'name' in payload is username
+            where: { username: (payload.name as string) || 'admin' } // Casting to string
         });
 
         if (!admin) return NextResponse.json({ error: 'Admin not found' }, { status: 404 });
