@@ -53,3 +53,28 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Error creating position' }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    if (!(await checkAdmin())) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    try {
+        const { id } = await request.json();
+
+        // Manual Cascade Delete
+        // 1. Delete Votes for this position
+        await prisma.vote.deleteMany({ where: { positionId: id } });
+
+        // 2. Delete Candidates for this position
+        await prisma.candidate.deleteMany({ where: { positionId: id } });
+
+        // 3. Delete Position
+        await prisma.position.delete({ where: { id } });
+
+        return NextResponse.json({ message: 'Deleted' });
+    } catch (error) {
+        console.error(error);
+        return NextResponse.json({ error: 'Error deleting position' }, { status: 500 });
+    }
+}

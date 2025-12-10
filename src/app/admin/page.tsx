@@ -52,6 +52,40 @@ export default function AdminPage() {
         );
     }
 
+    function ChangePasswordForm() {
+        const [oldPassword, setOldPassword] = useState('');
+        const [newPassword, setNewPassword] = useState('');
+        const [msg, setMsg] = useState('');
+        const [err, setErr] = useState('');
+
+        const handleChange = async (e: React.FormEvent) => {
+            e.preventDefault();
+            setMsg(''); setErr('');
+            const res = await fetch('/api/admin/password', {
+                method: 'POST',
+                body: JSON.stringify({ oldPassword, newPassword })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setMsg('Password updated!');
+                setOldPassword('');
+                setNewPassword('');
+            } else {
+                setErr(data.error);
+            }
+        };
+
+        return (
+            <form onSubmit={handleChange} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <input type="password" placeholder="Current Password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="input-field" required />
+                <input type="password" placeholder="New Password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="input-field" required />
+                <button className="btn btn-outline" style={{ borderColor: '#ff6b6b', color: '#ff6b6b' }}>Change Password</button>
+                {msg && <p style={{ color: '#4caf50', fontSize: '0.9rem' }}>{msg}</p>}
+                {err && <p style={{ color: '#ff6b6b', fontSize: '0.9rem' }}>{err}</p>}
+            </form>
+        );
+    }
+
     const [positions, setPositions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -199,39 +233,37 @@ export default function AdminPage() {
                     </div>
                 )}
                 {settings && (
-                    <form onSubmit={saveSettings} className="settings-form">
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '5px' }}>Start Time</label>
-                            <Flatpickr
-                                value={settings.startTime}
-                                onChange={([date]) => setSettings({ ...settings, startTime: date })}
-                                options={{
-                                    enableTime: true,
-                                    dateFormat: "F j, Y h:i K",
-                                    time_24hr: false,
-                                }}
-                                className="input-field"
-                                placeholder="Select Start Time"
-                            />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                        <form onSubmit={saveSettings} className="settings-form">
+                            <h3>Election Window</h3>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px' }}>Start Time</label>
+                                <Flatpickr
+                                    value={settings.startTime}
+                                    onChange={([date]) => setSettings({ ...settings, startTime: date })}
+                                    options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
+                                    className="input-field"
+                                />
+                            </div>
+                            <div>
+                                <label style={{ display: 'block', marginBottom: '5px' }}>End Time</label>
+                                <Flatpickr
+                                    value={settings.endTime}
+                                    onChange={([date]) => setSettings({ ...settings, endTime: date })}
+                                    options={{ enableTime: true, dateFormat: "F j, Y h:i K", time_24hr: false }}
+                                    className="input-field"
+                                />
+                            </div>
+                            <button className="btn btn-primary" disabled={savingSettings}>
+                                {savingSettings ? 'Saving...' : 'Update Window'}
+                            </button>
+                        </form>
+
+                        <div className="card" style={{ background: 'rgba(255,100,100,0.1)', border: '1px solid rgba(255,100,100,0.2)' }}>
+                            <h3 style={{ marginBottom: '1rem', color: '#ff6b6b' }}>Security</h3>
+                            <ChangePasswordForm />
                         </div>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '5px' }}>End Time</label>
-                            <Flatpickr
-                                value={settings.endTime}
-                                onChange={([date]) => setSettings({ ...settings, endTime: date })}
-                                options={{
-                                    enableTime: true,
-                                    dateFormat: "F j, Y h:i K",
-                                    time_24hr: false,
-                                }}
-                                className="input-field"
-                                placeholder="Select End Time"
-                            />
-                        </div>
-                        <button className="btn btn-primary" disabled={savingSettings}>
-                            {savingSettings ? 'Saving...' : 'Update Window'}
-                        </button>
-                    </form>
+                    </div>
                 )}
             </div>
 
@@ -289,8 +321,22 @@ export default function AdminPage() {
             <div style={{ display: 'grid', gap: '2rem' }}>
                 {positions.map(p => (
                     <div key={p.id} className="card">
-                        <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{p.title}</h3>
-                        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>{p.description}</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{p.title}</h3>
+                                <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>{p.description}</p>
+                            </div>
+                            <button
+                                onClick={async () => {
+                                    if (!confirm('Delete this position? This will delete all candidates and votes associated with it!')) return;
+                                    await fetch('/api/admin/positions', { method: 'DELETE', body: JSON.stringify({ id: p.id }) });
+                                    fetchPositions();
+                                }}
+                                style={{ background: 'none', border: '1px solid #ff6b6b', color: '#ff6b6b', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer' }}
+                            >
+                                Delete Position
+                            </button>
+                        </div>
 
                         <h4 style={{ marginBottom: '0.5rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Candidates</h4>
                         <div style={{ display: 'grid', gap: '0.5rem' }}>

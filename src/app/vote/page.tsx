@@ -13,37 +13,39 @@ export default function VotingPage() {
     const [success, setSuccess] = useState(false); // Used to trigger fetch of updated status or just local UI update
     const [hasVoted, setHasVoted] = useState(false);
 
+    const [status, setStatus] = useState<any>(null);
+
     useEffect(() => {
         fetchData();
     }, []);
 
     const fetchData = async () => {
         try {
-            // Fetch Positions
-            const posRes = await fetch('/api/admin/positions'); // Public endpoint usage
-            if (posRes.status === 401) {
-                router.push('/login');
-                return;
-            }
+            const [posRes, voteRes, statusRes] = await Promise.all([
+                fetch('/api/admin/positions'),
+                fetch('/api/my-votes'),
+                fetch('/api/election-status')
+            ]);
+
+            if (posRes.status === 401) { router.push('/login'); return; }
+
             const posData = await posRes.json();
             setPositions(posData);
 
-            // Fetch User Vote Status
-            const voteRes = await fetch('/api/my-votes');
             if (voteRes.ok) {
                 const voteData = await voteRes.json();
                 if (voteData.hasVoted) {
                     setHasVoted(true);
-                    // Map votes to selections
                     const votesMap: any = {};
-                    voteData.votes.forEach((v: any) => {
-                        votesMap[v.positionId] = v.candidateId;
-                    });
+                    voteData.votes.forEach((v: any) => { votesMap[v.positionId] = v.candidateId; });
                     setSelections(votesMap);
-                    // We don't necessarily setSuccess(true) here because we want to show the form in read-only mode, 
-                    // not the "Thank You" banner alone.
                 }
             }
+
+            if (statusRes.ok) {
+                setStatus(await statusRes.json());
+            }
+
         } catch (err) {
             console.error(err);
         } finally {
@@ -51,52 +53,28 @@ export default function VotingPage() {
         }
     };
 
-    const selectCandidate = (positionId: string, candidateId: string) => {
-        if (hasVoted) return; // Read only
-        setSelections(prev => ({ ...prev, [positionId]: candidateId }));
-    };
-
-    const submitVote = async () => {
-        // Validation: Check if all positions have a selection
-        if (positions.length > Object.keys(selections).length) {
-            alert('Please select a vote for every position before submitting.');
-            return;
-        }
-
-        if (!confirm('Are you sure you want to submit your vote? This cannot be undone.')) return;
-
-        setSubmitting(true);
-        setError('');
-
-        const votes = Object.entries(selections).map(([positionId, candidateId]) => ({
-            positionId,
-            candidateId,
-        }));
-
-        try {
-            const res = await fetch('/api/vote', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ votes }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) throw new Error(data.error || 'Voting failed');
-
-            setSuccess(true);
-            setHasVoted(true);
-            window.scrollTo(0, 0);
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    // ... existing selectCandidate ...
+    // ... existing submitVote ...
 
     if (loading) return <div className="container">Loading...</div>;
 
-    // ... (rest of render)
+    // Block if closed (unless verifying own vote)
+    const isClosed = status && (!status.isOpen || status.positionCount === 0);
+    if (isClosed && !hasVoted) {
+        return (
+            <div className="container" style={{ padding: '2rem 0', textAlign: 'center' }}>
+                <h1 className="title-gradient">Voting Closed</h1>
+                <div className="card" style={{ marginTop: '2rem', padding: '3rem' }}>
+                    <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>
+                        {status?.positionCount === 0 ? "There are no positions to vote for." : "The voting window is currently closed."}
+                    </p>
+                    <button onClick={() => router.push('/dashboard')} className="btn btn-primary" style={{ marginTop: '2rem' }}>
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container" style={{ padding: '2rem 0' }}>

@@ -8,12 +8,15 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [hasVoted, setHasVoted] = useState(false);
 
+    const [status, setStatus] = useState<any>(null); // { isOpen, positionCount, ... }
+
     useEffect(() => {
         checkStatus();
     }, []);
 
     const checkStatus = async () => {
         try {
+            // Check Auth
             const res = await fetch('/api/my-votes');
             if (res.status === 401) {
                 router.push('/login');
@@ -22,6 +25,12 @@ export default function DashboardPage() {
             if (res.ok) {
                 const data = await res.json();
                 setHasVoted(data.hasVoted);
+            }
+
+            // Check Election Status
+            const statusRes = await fetch('/api/election-status');
+            if (statusRes.ok) {
+                setStatus(await statusRes.json());
             }
         } catch (err) {
             console.error(err);
@@ -36,6 +45,8 @@ export default function DashboardPage() {
     };
 
     if (loading) return <div className="container">Loading...</div>;
+
+    const showVotingButton = status?.isOpen && status?.positionCount > 0;
 
     return (
         <div className="container" style={{ padding: '2rem 0' }}>
@@ -53,13 +64,21 @@ export default function DashboardPage() {
                     </p>
                 ) : (
                     <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-                        Your membership is active. Please proceed to cast your vote for the AGM.
+                        Your membership is active.
+                        {!showVotingButton && !hasVoted && (
+                            <span style={{ display: 'block', marginTop: '10px', color: '#ff6b6b' }}>
+                                {status?.positionCount === 0 ? "There are no open positions to vote for at this time." : "Voting is currently closed."}
+                            </span>
+                        )}
+                        {showVotingButton && " Please proceed to cast your vote for the AGM."}
                     </p>
                 )}
 
-                <button onClick={() => router.push('/vote')} className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '15px 30px' }}>
-                    {hasVoted ? 'See How You Voted' : 'Go to Voting Page'}
-                </button>
+                {(showVotingButton || hasVoted) && (
+                    <button onClick={() => router.push('/vote')} className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '15px 30px' }}>
+                        {hasVoted ? 'See How You Voted' : 'Go to Voting Page'}
+                    </button>
+                )}
             </div>
         </div>
     );
