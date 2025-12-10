@@ -207,8 +207,8 @@ export default function AdminPage() {
                 )}
                 {settings && (
 
+                    <h3>Election Window</h3>
                     <form onSubmit={saveSettings} className="settings-form">
-                        <h3>Election Window</h3>
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px' }}>Start Time</label>
                             <Flatpickr
