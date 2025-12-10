@@ -52,39 +52,7 @@ export default function AdminPage() {
         );
     }
 
-    function ChangePasswordForm() {
-        const [oldPassword, setOldPassword] = useState('');
-        const [newPassword, setNewPassword] = useState('');
-        const [msg, setMsg] = useState('');
-        const [err, setErr] = useState('');
 
-        const handleChange = async (e: React.FormEvent) => {
-            e.preventDefault();
-            setMsg(''); setErr('');
-            const res = await fetch('/api/admin/password', {
-                method: 'POST',
-                body: JSON.stringify({ oldPassword, newPassword })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setMsg('Password updated!');
-                setOldPassword('');
-                setNewPassword('');
-            } else {
-                setErr(data.error);
-            }
-        };
-
-        return (
-            <form onSubmit={handleChange} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input type="password" placeholder="Current Password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="input-field" required />
-                <input type="password" placeholder="New Password" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="input-field" required />
-                <button className="btn btn-outline" style={{ borderColor: '#ff6b6b', color: '#ff6b6b' }}>Change Password</button>
-                {msg && <p style={{ color: '#4caf50', fontSize: '0.9rem' }}>{msg}</p>}
-                {err && <p style={{ color: '#ff6b6b', fontSize: '0.9rem' }}>{err}</p>}
-            </form>
-        );
-    }
 
     const [positions, setPositions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -185,9 +153,14 @@ export default function AdminPage() {
         <div className="container" style={{ padding: '2rem 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h1 className="title-gradient">Admin Dashboard</h1>
-                <button onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/login'); }} className="btn btn-outline">
-                    Logout
-                </button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button onClick={() => router.push('/admin/change-password')} className="btn btn-outline" style={{ borderColor: 'var(--pk-primary)', color: 'var(--pk-primary)' }}>
+                        Change Password
+                    </button>
+                    <button onClick={async () => { await fetch('/api/auth/logout', { method: 'POST' }); router.push('/login'); }} className="btn btn-outline">
+                        Logout
+                    </button>
+                </div>
             </div>
 
             {/* Analytics Section */}
@@ -259,10 +232,6 @@ export default function AdminPage() {
                             </button>
                         </form>
 
-                        <div className="card" style={{ background: 'rgba(255,100,100,0.1)', border: '1px solid rgba(255,100,100,0.2)' }}>
-                            <h3 style={{ marginBottom: '1rem', color: '#ff6b6b' }}>Security</h3>
-                            <ChangePasswordForm />
-                        </div>
                     </div>
                 )}
             </div>
