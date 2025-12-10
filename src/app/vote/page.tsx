@@ -53,8 +53,48 @@ export default function VotingPage() {
         }
     };
 
-    // ... existing selectCandidate ...
-    // ... existing submitVote ...
+    const selectCandidate = (positionId: string, candidateId: string) => {
+        if (hasVoted) return; // Read only
+        setSelections(prev => ({ ...prev, [positionId]: candidateId }));
+    };
+
+    const submitVote = async () => {
+        // Validation: Check if all positions have a selection
+        if (positions.length > Object.keys(selections).length) {
+            alert('Please select a vote for every position before submitting.');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to submit your vote? This cannot be undone.')) return;
+
+        setSubmitting(true);
+        setError('');
+
+        const votes = Object.entries(selections).map(([positionId, candidateId]) => ({
+            positionId,
+            candidateId,
+        }));
+
+        try {
+            const res = await fetch('/api/vote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ votes }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || 'Voting failed');
+
+            setSuccess(true);
+            setHasVoted(true);
+            window.scrollTo(0, 0);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     if (loading) return <div className="container">Loading...</div>;
 
