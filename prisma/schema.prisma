@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") // Uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // Uses direct connection
+}
+
+model Member {
+  id        String   @id @default(uuid())
+  name      String
+  idCard    String   @unique
+  mobile    String   @unique
+  email     String?
+  password  String
+  isVerified Boolean @default(false)
+  verificationCode String?
+  verificationExpires DateTime?
+  hasVoted  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  votes     Vote[]
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  username String @unique
+  password String
+}
+
+model Position {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  candidates  Candidate[]
+  votes       Vote[]
+}
+
+model Candidate {
+  id         String   @id @default(uuid())
+  name       String
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id])
+  votes      Vote[]
+}
+
+model Vote {
+  id          String    @id @default(uuid())
+  memberId    String
+  candidateId String
+  positionId  String
+  member      Member    @relation(fields: [memberId], references: [id])
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  position    Position  @relation(fields: [positionId], references: [id])
+
+  @@unique([memberId, positionId])
+}
+
+model ElectionSettings {
+  id        String   @id @default(uuid())
+  startTime DateTime
+  endTime   DateTime
+  isActive  Boolean  @default(true) // Master switch
+  updatedAt DateTime @updatedAt
+}
