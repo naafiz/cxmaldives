@@ -130,7 +130,7 @@ export default function RegisterPage() {
                         </div>
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>Mobile Number</label>
-                            <input name="mobile" className="input-field" placeholder="9XXXXXX" required onChange={handleChange} value={formData.mobile} />
+                            <input name="mobile" type="tel" inputMode="numeric" pattern="[0-9]*" className="input-field" placeholder="9XXXXXX" required onChange={handleChange} value={formData.mobile} />
                         </div>
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>Password</label>
@@ -158,6 +158,10 @@ export default function RegisterPage() {
                             <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>Verification Code</label>
                             <input
                                 name="otp"
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                autoComplete="one-time-code"
                                 className="input-field"
                                 placeholder="123456"
                                 required

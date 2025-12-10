@@ -101,6 +101,10 @@ export default function ForgotPasswordPage() {
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px', color: 'var(--text-muted)' }}>Verification Code</label>
                             <input
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                autoComplete="one-time-code"
                                 className="input-field"
                                 placeholder="123456"
                                 required
