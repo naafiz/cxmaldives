@@ -41,7 +41,7 @@ model Position {
 
 model Whitelist {
   id        String   @id @default(uuid())
-  mobile    String   @unique
+  idCard    String   @unique
   createdAt DateTime @default(now())
 }
 

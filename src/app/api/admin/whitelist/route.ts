@@ -21,15 +21,15 @@ export async function POST(request: Request) {
     if (!(await checkAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     try {
-        const { mobile } = await request.json();
+        const { idCard } = await request.json();
 
-        if (!mobile) return NextResponse.json({ error: 'Mobile required' }, { status: 400 });
+        if (!idCard) return NextResponse.json({ error: 'ID Card required' }, { status: 400 });
 
         const entry = await prisma.whitelist.create({
-            data: { mobile }
+            data: { idCard: idCard.toUpperCase() }
         });
 
-        await logAdminAction('WHITELIST_ADD', `Added mobile: ${mobile}`);
+        await logAdminAction('WHITELIST_ADD', `Added ID: ${idCard}`);
 
         return NextResponse.json(entry);
     } catch (error) {
@@ -41,13 +41,13 @@ export async function DELETE(request: Request) {
     if (!(await checkAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     try {
-        const { id, mobile } = await request.json();
+        const { id, idCard } = await request.json();
 
         await prisma.whitelist.delete({
             where: { id }
         });
 
-        await logAdminAction('WHITELIST_REMOVE', `Removed mobile: ${mobile}`);
+        await logAdminAction('WHITELIST_REMOVE', `Removed ID: ${idCard}`);
 
         return NextResponse.json({ message: 'Removed' });
     } catch (error) {
