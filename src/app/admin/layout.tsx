@@ -13,6 +13,8 @@ export default function AdminLayout({
     const navItems = [
         { name: 'Dashboard', path: '/admin' },
         { name: 'Manage Members', path: '/admin/members' },
+        { name: 'Whitelist', path: '/admin/whitelist' },
+        { name: 'Audit Logs', path: '/admin/audit' },
         { name: 'Voting Window', path: '/admin/settings' },
         { name: 'Positions & Candidates', path: '/admin/positions' },
     ];

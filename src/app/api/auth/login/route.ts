@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { signSession } from '@/lib/auth';
+import { logAdminAction } from '@/lib/audit';
 import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
@@ -19,8 +20,15 @@ export async function POST(request: Request) {
             where: { username: idCard },
         });
 
+        import { logAdminAction } from '@/lib/audit'; // Add import at top of file
+
+        // ... inside function ...
+
         if (admin && await bcrypt.compare(password, admin.password)) {
+            await logAdminAction('ADMIN_LOGIN', `Admin ${admin.username} logged in`); // Log action
+
             const session = await signSession({ id: admin.id, name: admin.username, role: 'admin' });
+            // ...
 
             (await cookies()).set('session', session, {
                 httpOnly: true,

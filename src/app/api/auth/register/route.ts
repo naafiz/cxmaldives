@@ -6,6 +6,15 @@ export async function POST(request: Request) {
     try {
         const { name, idCard, mobile, email, password } = await request.json();
 
+        // 1. Check Whitelist
+        const whitelisted = await prisma.whitelist.findUnique({
+            where: { idCard: idCard.toUpperCase() } // Whitelist should be uppercase AXXXXXX
+        });
+
+        if (!whitelisted) {
+            return NextResponse.json({ error: 'Your ID Card is not whitelisted for registration.' }, { status: 403 });
+        }
+
         if (!name || !idCard || !mobile || !password) {
             return NextResponse.json({ error: 'All fields (except email) are required' }, { status: 400 });
         }

@@ -61,9 +61,12 @@ export async function POST(request: Request) {
             }
         });
 
-        return NextResponse.json(updated);
+        await logAdminAction('SETTINGS_UPDATE', `Updated election window: ${new Date(startTime).toLocaleString()} - ${new Date(endTime).toLocaleString()}`);
+
+        return NextResponse.json({ message: 'Settings updated' });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+```

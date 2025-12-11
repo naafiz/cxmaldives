@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
+import { logAdminAction } from '@/lib/audit';
 
 async function checkAdmin() {
     const session = (await cookies()).get('session')?.value;
@@ -52,6 +53,8 @@ export async function DELETE(request: Request) {
                 id: { in: ids }
             }
         });
+
+        await logAdminAction('MEMBER_DELETE', `Deleted IDs: ${ids.join(', ')}`);
 
         return NextResponse.json({ message: 'Members deleted' });
     } catch (error) {

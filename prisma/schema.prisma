@@ -38,6 +38,21 @@ model Position {
   votes       Vote[]
 }
 
+model Whitelist {
+  id        String   @id @default(uuid())
+  idCard    String   @unique
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String
+  details   String?
+  ip        String?
+  adminId   String?
+  createdAt DateTime @default(now())
+}
+
 model Candidate {
   id         String   @id @default(uuid())
   name       String
