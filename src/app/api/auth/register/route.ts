@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
-import { sendWhatsAppOTP } from '@/lib/twilio';
 
 export async function POST(request: Request) {
     try {
@@ -25,34 +24,21 @@ export async function POST(request: Request) {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Generate 6-digit OTP
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-
-        // Create Member
+        // Create Member (isVerified defaults to false in schema if not provided, but explicit is good)
+        // User requested: keep isVerified = false
         const member = await prisma.member.create({
             data: {
                 name,
                 idCard,
                 mobile,
-                email: email || null,
+                email,
                 password: hashedPassword,
-                verificationCode,
-                verificationExpires,
-                isVerified: false,
+                isVerified: false, // Explicitly false as requested
             },
         });
 
-        // Send OTP via WhatsApp
-        try {
-            await sendWhatsAppOTP(mobile, verificationCode);
-        } catch (error) {
-            console.error('Failed to send WhatsApp OTP:', error);
-            // Optional: return error or allow registration but warn?
-            // For now, valid flow requires OTP.
-        }
-
-        return NextResponse.json({ message: 'User created. OTP sent.' }, { status: 201 });
+        // No OTP sent.
+        return NextResponse.json({ message: 'Registration successful. Please login.' }, { status: 201 });
     } catch (error) {
         console.error('Registration error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
