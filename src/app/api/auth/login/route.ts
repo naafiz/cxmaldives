@@ -48,9 +48,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }
 
-        if (!member.isVerified) {
-            return NextResponse.json({ error: 'Account not verified. Please verify your mobile number.' }, { status: 403 });
-        }
+        // if (!member.isVerified) {
+        //     return NextResponse.json({ error: 'Account not verified. Please verify your mobile number.' }, { status: 403 });
+        // }
 
         // Create Session
         const session = await signSession({ id: member.id, name: member.name, role: 'member' });

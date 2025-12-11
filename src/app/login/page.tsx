@@ -37,8 +37,8 @@ export default function LoginPage() {
             } else {
                 router.push('/dashboard');
             }
-        } catch (err: any) {
-            setError(err.message);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Login failed');
         } finally {
             setLoading(false);
         }
@@ -67,11 +67,11 @@ export default function LoginPage() {
                         <input name="password" type="password" className="input-field" placeholder="••••••••" required onChange={handleChange} value={formData.password} />
                     </div>
 
-                    <div style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
+                    {/* <div style={{ textAlign: 'right', marginTop: '-0.5rem' }}>
                         <a href="/forgot-password" style={{ fontSize: '0.85rem', color: 'var(--pk-primary)', textDecoration: 'none' }}>
                             Forgot Password?
                         </a>
-                    </div>
+                    </div> */}
 
                     <button type="submit" className="btn btn-primary" disabled={loading} style={{ marginTop: '1rem' }}>
                         {loading ? 'Logging in...' : 'Login'}
