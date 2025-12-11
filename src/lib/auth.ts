@@ -17,7 +17,19 @@ export async function verifySession(token: string) {
             algorithms: ['HS256'],
         });
         return payload;
+
+        return payload;
     } catch (error) {
         return null;
     }
+}
+
+import { cookies } from 'next/headers';
+
+export async function checkAdmin() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('session')?.value;
+    if (!token) return false;
+    const session = await verifySession(token);
+    return session?.role === 'admin';
 }
