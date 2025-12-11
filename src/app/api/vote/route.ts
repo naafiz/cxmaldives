@@ -23,7 +23,7 @@ export async function POST(request: Request) {
         // 2. Fetch Member to check status
         const member = await prisma.member.findUnique({ where: { id: memberId } });
         if (!member) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
-        if (!member.isVerified) return NextResponse.json({ error: 'Member not verified' }, { status: 403 });
+        // if (!member.isVerified) return NextResponse.json({ error: 'Member not verified' }, { status: 403 }); // Removed verification check
         if (member.hasVoted) return NextResponse.json({ error: 'You have already voted.' }, { status: 403 });
 
         // 3. Parse Votes
@@ -58,8 +58,8 @@ export async function POST(request: Request) {
         });
 
         return NextResponse.json({ message: 'Vote cast successfully' });
-    } catch (error: any) {
-        if (error.message === 'Already voted') {
+    } catch (error: unknown) {
+        if (error instanceof Error && error.message === 'Already voted') {
             return NextResponse.json({ error: 'You have already voted.' }, { status: 403 });
         }
         console.error(error);
