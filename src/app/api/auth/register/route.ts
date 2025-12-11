@@ -9,11 +9,11 @@ export async function POST(request: Request) {
 
         // 1. Check Whitelist
         const whitelisted = await prisma.whitelist.findUnique({
-            where: { idCard: idCard.toUpperCase() } // Whitelist should be uppercase AXXXXXX
+            where: { mobile: mobile }
         });
 
         if (!whitelisted) {
-            return NextResponse.json({ error: 'Your ID Card is not whitelisted for registration.' }, { status: 403 });
+            return NextResponse.json({ error: 'Your Mobile Number is not whitelisted for registration.' }, { status: 403 });
         }
 
         if (!name || !idCard || !mobile || !password) {

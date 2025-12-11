@@ -1,43 +1,55 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { logAdminAction } from '@/lib/audit';
+import { checkAdmin } from '@/lib/auth'; // Assuming checkAdmin is imported from here
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const list = await prisma.whitelist.findMany({
+        const entries = await prisma.whitelist.findMany({
             orderBy: { createdAt: 'desc' },
         });
-        return NextResponse.json(list);
+
+        return NextResponse.json(entries);
     } catch (error) {
         return NextResponse.json({ error: 'Failed' }, { status: 500 });
     }
 }
 
 export async function POST(request: Request) {
-    try {
-        const { idCard } = await request.json();
-        if (!idCard) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+    if (!(await checkAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        await prisma.whitelist.create({
-            data: { idCard: idCard.trim().toUpperCase() }
+    try {
+        const { mobile } = await request.json();
+
+        if (!mobile) return NextResponse.json({ error: 'Mobile required' }, { status: 400 });
+
+        const entry = await prisma.whitelist.create({
+            data: { mobile }
         });
 
-        await logAdminAction('WHITELIST_ADD', `Added ${idCard}`);
-        return NextResponse.json({ message: 'Added' });
+        await logAdminAction('WHITELIST_ADD', `Added mobile: ${mobile}`);
+
+        return NextResponse.json(entry);
     } catch (error) {
-        return NextResponse.json({ error: 'Failed or Duplicate' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed' }, { status: 500 });
     }
 }
 
 export async function DELETE(request: Request) {
-    try {
-        const { id, idCard } = await request.json();
-        await prisma.whitelist.delete({ where: { id } });
+    if (!(await checkAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        await logAdminAction('WHITELIST_REMOVE', `Removed ${idCard}`);
-        return NextResponse.json({ message: 'Deleted' });
+    try {
+        const { id, mobile } = await request.json();
+
+        await prisma.whitelist.delete({
+            where: { id }
+        });
+
+        await logAdminAction('WHITELIST_REMOVE', `Removed mobile: ${mobile}`);
+
+        return NextResponse.json({ message: 'Removed' });
     } catch (error) {
         return NextResponse.json({ error: 'Failed' }, { status: 500 });
     }
