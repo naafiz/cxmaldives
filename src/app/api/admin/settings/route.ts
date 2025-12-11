@@ -1,4 +1,3 @@
-```typescript
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifySession } from '@/lib/auth';
@@ -63,7 +62,7 @@ export async function POST(request: Request) {
             }
         });
 
-        await logAdminAction('SETTINGS_UPDATE', `Updated election window: ${ new Date(startTime).toLocaleString() } - ${ new Date(endTime).toLocaleString() } `);
+        await logAdminAction('SETTINGS_UPDATE', `Updated election window: ${new Date(startTime).toLocaleString()} - ${new Date(endTime).toLocaleString()} `);
 
         return NextResponse.json({ message: 'Settings updated' });
     } catch (error) {
@@ -71,4 +70,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
-```
+}
