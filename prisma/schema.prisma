@@ -18,6 +18,7 @@ model Member {
   isVerified Boolean @default(false)
   verificationCode String?
   verificationExpires DateTime?
+  lastLogin  DateTime?
   hasVoted  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

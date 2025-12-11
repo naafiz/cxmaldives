@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Skeleton from '@/components/Skeleton';
 
 export default function AdminDashboardPage() {
-    const router = useRouter();
+    // const router = useRouter(); // Unused
     const [stats, setStats] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState<any>(null);

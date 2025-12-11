@@ -3,15 +3,24 @@
 import { useEffect, useState } from 'react';
 import Skeleton from '@/components/Skeleton';
 
+interface Candidate {
+    id: string;
+    name: string;
+    positionId: string;
+}
+
+interface Position {
+    id: string;
+    title: string;
+    description: string;
+    candidates: Candidate[];
+}
+
 export default function PositionsPage() {
-    const [positions, setPositions] = useState<any[]>([]);
+    const [positions, setPositions] = useState<Position[]>([]);
     const [loading, setLoading] = useState(true);
     const [newPosition, setNewPosition] = useState({ title: '', description: '' });
     const [newCandidate, setNewCandidate] = useState({ name: '', positionId: '' });
-
-    useEffect(() => {
-        fetchPositions();
-    }, []);
 
     const fetchPositions = async () => {
         const res = await fetch('/api/admin/positions');
@@ -20,6 +29,10 @@ export default function PositionsPage() {
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        fetchPositions();
+    }, []);
 
     const createPosition = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -129,7 +142,7 @@ export default function PositionsPage() {
                         <h4 style={{ marginBottom: '0.5rem', borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>Candidates</h4>
                         <div style={{ display: 'grid', gap: '0.5rem' }}>
                             {p.candidates.length === 0 && <p style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No candidates yet.</p>}
-                            {p.candidates.map((c: any) => (
+                            {p.candidates.map((c) => (
                                 <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px' }}>
                                     <span>{c.name}</span>
                                     <button onClick={() => deleteCandidate(c.id)} style={{ background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer' }}>

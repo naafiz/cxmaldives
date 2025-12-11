@@ -1,22 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Skeleton from '@/components/Skeleton';
 
+interface WhitelistItem {
+    id: string;
+    idCard: string;
+    createdAt: string;
+}
+
 export default function WhitelistPage() {
-    const [list, setList] = useState<any[]>([]);
+    const [list, setList] = useState<WhitelistItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [newId, setNewId] = useState('');
 
-    useEffect(() => {
-        fetchList();
+    const fetchList = useCallback(async () => {
+        try {
+            const res = await fetch('/api/admin/whitelist');
+            if (res.ok) setList(await res.json());
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    const fetchList = async () => {
-        const res = await fetch('/api/admin/whitelist');
-        if (res.ok) setList(await res.json());
-        setLoading(false);
-    };
+    useEffect(() => {
+        fetchList();
+    }, [fetchList]);
 
     const addId = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,7 +41,7 @@ export default function WhitelistPage() {
         }
     };
 
-    const removeId = async (item: any) => {
+    const removeId = async (item: WhitelistItem) => {
         if (!confirm(`Remove ${item.idCard}?`)) return;
         await fetch('/api/admin/whitelist', {
             method: 'DELETE',

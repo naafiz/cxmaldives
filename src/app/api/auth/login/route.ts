@@ -54,6 +54,12 @@ export async function POST(request: Request) {
         // Log Member Login
         await logAdminAction('MEMBER_LOGIN', `Member ${member.name} (${member.idCard}) logged in`, member.id);
 
+        // Update Last Login
+        await prisma.member.update({
+            where: { id: member.id },
+            data: { lastLogin: new Date() }
+        });
+
         // Create Session
         const session = await signSession({ id: member.id, name: member.name, role: 'member' });
 

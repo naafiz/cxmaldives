@@ -1,18 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Skeleton from '@/components/Skeleton';
 
+interface Member {
+    id: string;
+    name: string;
+    idCard: string;
+    mobile: string;
+    email: string;
+    lastLogin: string | null;
+}
+
 export default function ManageMembersPage() {
-    const [members, setMembers] = useState<any[]>([]);
+    const [members, setMembers] = useState<Member[]>([]);
     const [loading, setLoading] = useState(true);
     const [selected, setSelected] = useState<string[]>([]);
 
-    useEffect(() => {
-        fetchMembers();
-    }, []);
-
-    const fetchMembers = async () => {
+    const fetchMembers = useCallback(async () => {
         try {
             const res = await fetch('/api/admin/members');
             if (res.ok) {
@@ -21,7 +26,11 @@ export default function ManageMembersPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchMembers();
+    }, [fetchMembers]);
 
     const toggleSelect = (id: string) => {
         if (selected.includes(id)) {
@@ -91,6 +100,7 @@ export default function ManageMembersPage() {
                                 <th style={{ padding: '10px', textAlign: 'left' }}>ID Card</th>
                                 <th style={{ padding: '10px', textAlign: 'left' }}>Mobile</th>
                                 <th style={{ padding: '10px', textAlign: 'left' }}>Email</th>
+                                <th style={{ padding: '10px', textAlign: 'left' }}>Last Login</th>
                                 <th style={{ padding: '10px', textAlign: 'right' }}>Action</th>
                             </tr>
                         </thead>
@@ -108,6 +118,9 @@ export default function ManageMembersPage() {
                                     <td style={{ padding: '10px' }}>{m.idCard}</td>
                                     <td style={{ padding: '10px' }}>{m.mobile}</td>
                                     <td style={{ padding: '10px' }}>{m.email}</td>
+                                    <td style={{ padding: '10px', color: m.lastLogin ? 'inherit' : 'var(--text-muted)' }}>
+                                        {m.lastLogin ? new Date(m.lastLogin).toLocaleString() : 'Never'}
+                                    </td>
                                     <td style={{ padding: '10px', textAlign: 'right' }}>
                                         <button
                                             onClick={() => deleteMembers([m.id])}

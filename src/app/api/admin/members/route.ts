@@ -27,6 +27,7 @@ export async function GET() {
                 idCard: true,
                 mobile: true,
                 email: true,
+                lastLogin: true,
                 createdAt: true,
             }
         });

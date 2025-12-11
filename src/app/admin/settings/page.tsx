@@ -5,20 +5,25 @@ import Flatpickr from 'react-flatpickr';
 import "flatpickr/dist/themes/dark.css";
 import Skeleton from '@/components/Skeleton';
 
+interface Settings {
+    startTime: Date;
+    endTime: Date;
+    isActive: boolean;
+}
+
 export default function VotingWindowPage() {
-    const [settings, setSettings] = useState<any>(null);
+    const [settings, setSettings] = useState<Settings | null>(null);
     const [loading, setLoading] = useState(true);
     const [savingSettings, setSavingSettings] = useState(false);
 
-    const fetchSettings = async () => {
-        const res = await fetch('/api/admin/settings');
-        if (res.ok) {
-            setSettings(await res.json());
-        }
-        setLoading(false);
-    };
-
     useEffect(() => {
+        const fetchSettings = async () => {
+            const res = await fetch('/api/admin/settings');
+            if (res.ok) {
+                setSettings(await res.json());
+            }
+            setLoading(false);
+        };
         fetchSettings();
     }, []);
 
@@ -42,7 +47,7 @@ export default function VotingWindowPage() {
                 {!settings ? (
                     <div style={{ textAlign: 'center', color: '#ff6b6b' }}>
                         <p>Failed to load settings.</p>
-                        <button onClick={fetchSettings} className="btn btn-outline" style={{ marginTop: '10px' }}>Retry</button>
+                        <button onClick={() => window.location.reload()} className="btn btn-outline" style={{ marginTop: '10px' }}>Retry</button>
                     </div>
                 ) : (
                     <>
