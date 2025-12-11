@@ -20,15 +20,10 @@ export async function POST(request: Request) {
             where: { username: idCard },
         });
 
-        import { logAdminAction } from '@/lib/audit'; // Add import at top of file
-
-        // ... inside function ...
-
         if (admin && await bcrypt.compare(password, admin.password)) {
-            await logAdminAction('ADMIN_LOGIN', `Admin ${admin.username} logged in`); // Log action
+            await logAdminAction('ADMIN_LOGIN', `Admin ${admin.username} logged in`, admin.id);
 
             const session = await signSession({ id: admin.id, name: admin.username, role: 'admin' });
-            // ...
 
             (await cookies()).set('session', session, {
                 httpOnly: true,
@@ -56,9 +51,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
         }
 
-        // if (!member.isVerified) {
-        //     return NextResponse.json({ error: 'Account not verified. Please verify your mobile number.' }, { status: 403 });
-        // }
+        // Log Member Login
+        await logAdminAction('MEMBER_LOGIN', `Member ${member.name} (${member.idCard}) logged in`, member.id);
 
         // Create Session
         const session = await signSession({ id: member.id, name: member.name, role: 'member' });

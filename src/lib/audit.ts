@@ -3,18 +3,21 @@ import { headers } from 'next/headers';
 import { cookies } from 'next/headers';
 import { verifySession } from './auth';
 
-export async function logAdminAction(action: string, details?: string) {
+export async function logAdminAction(action: string, details?: string, actorId?: string) {
     try {
         const headerStore = await headers();
         const ip = headerStore.get('x-forwarded-for') || 'unknown';
 
-        const cookieStore = await cookies();
-        const session = cookieStore.get('session')?.value;
-        let adminId = 'system';
+        let adminId = actorId || 'system';
 
-        if (session) {
-            const payload = await verifySession(session);
-            if (payload && payload.id) adminId = payload.id as string;
+        if (!actorId) {
+            const cookieStore = await cookies();
+            const session = cookieStore.get('session')?.value;
+
+            if (session) {
+                const payload = await verifySession(session);
+                if (payload && payload.id) adminId = payload.id as string;
+            }
         }
 
         await prisma.auditLog.create({

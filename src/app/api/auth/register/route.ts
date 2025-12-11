@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { logAdminAction } from '@/lib/audit';
 
 export async function POST(request: Request) {
     try {
@@ -45,6 +46,8 @@ export async function POST(request: Request) {
                 isVerified: false, // Explicitly false as requested
             },
         });
+
+        await logAdminAction('MEMBER_REGISTER', `Member registered: ${name} (${idCard})`, member.id);
 
         // No OTP sent.
         return NextResponse.json({ message: 'Registration successful. Please login.' }, { status: 201 });

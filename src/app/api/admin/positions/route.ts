@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { verifySession } from '@/lib/auth';
+import { logAdminAction } from '@/lib/audit';
 
 // Helper to check admin role
 export const dynamic = 'force-dynamic';
@@ -48,6 +49,7 @@ export async function POST(request: Request) {
         const position = await prisma.position.create({
             data: { title, description },
         });
+        await logAdminAction('POSITION_CREATE', `Created position: ${title}`);
         return NextResponse.json(position, { status: 201 });
     } catch (error) {
         return NextResponse.json({ error: 'Error creating position' }, { status: 500 });
